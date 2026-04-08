@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>König · 私人领地</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(145deg, #1f2e2a 0%, #16221f 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 16px;
+        }
+
+        .login-panel {
+            width: 100%;
+            max-width: 380px;
+            background: rgba(254, 249, 232, 0.96);
+            backdrop-filter: blur(2px);
+            border-radius: 48px;
+            padding: 36px 28px;
+            text-align: center;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.25);
+        }
+
+        .login-panel h2 {
+            color: #2c4b3e;
+            margin-bottom: 28px;
+            font-weight: 600;
+            font-size: 26px;
+        }
+
+        .login-panel input {
+            width: 100%;
+            padding: 14px 18px;
+            margin: 12px 0;
+            border: 1px solid #e2d5c0;
+            border-radius: 60px;
+            font-size: 16px;
+            background: white;
+        }
+
+        .login-panel input:focus {
+            outline: none;
+            border-color: #c0a06b;
+            box-shadow: 0 0 0 3px rgba(192, 160, 107, 0.2);
+        }
+
+        .login-panel button {
+            background: linear-gradient(135deg, #2e5a4a, #1f3f34);
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 60px;
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .login-panel button:active {
+            transform: scale(0.97);
+        }
+
+        .error-msg {
+            color: #c45a2c;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+
+        .remember-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 14px;
+            color: #5a6e5a;
+        }
+        .remember-row label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 600px;
+            height: calc(100vh - 32px);
+            background: #fffaf0;
+            border-radius: 48px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .top-bar {
+            background: #2c4b3e;
+            color: #ffefcf;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 239, 207, 0.2);
+        }
+
+        .top-bar span:first-child {
+            font-weight: 600;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logout-btn {
+            background: none;
+            border: none;
+            color: #ffcf9a;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 4px 10px;
+            border-radius: 40px;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            background: #fef7e8;
+        }
+
+        .message {
+            display: flex;
+            flex-direction: column;
+            max-width: 85%;
+            animation: fadeIn 0.2s ease;
+        }
+        .user-message { align-self: flex-end; }
+        .ai-message { align-self: flex-start; }
+        .bubble {
+            padding: 10px 16px;
+            border-radius: 24px;
+            font-size: 15px;
+            line-height: 1.4;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .user-message .bubble {
+            background: #007aff;
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+        .ai-message .bubble {
+            background: #e9e2d2;
+            color: #2c3e2b;
+            border-bottom-left-radius: 6px;
+        }
+
+        .translation-row {
+            font-size: 12px;
+            color: #8b765a;
+            margin-top: 4px;
+            margin-left: 8px;
+            padding: 4px 10px;
+            background: #f0e9dd;
+            border-radius: 16px;
+            display: inline-block;
+            max-width: 90%;
+        }
+
+        .message-buttons {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+            margin-left: 8px;
+        }
+        .msg-btn {
+            background: #e9e2d2;
+            border: none;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 40px;
+        }
+
+        .input-area {
+            padding: 14px 20px 22px;
+            background: #fffaf0;
+            border-top: 1px solid #e6dbc8;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .message-input {
+            flex: 1;
+            border: 1px solid #e0d2bc;
+            border-radius: 40px;
+            padding: 12px 18px;
+            font-size: 16px;
+            background: white;
+            resize: none;
+            font-family: inherit;
+        }
+        .send-btn {
+            background: #2c4b3e;
+            border: none;
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 48px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 90px;
+            left: 20px;
+            right: 20px;
+            background: #1e352b;
+            color: #ffefcf;
+            text-align: center;
+            padding: 12px;
+            border-radius: 60px;
+            z-index: 2000;
+            animation: fadeOut 2s forwards;
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; }
+        }
+        .hidden { display: none; }
+        .typing-indicator {
+            background: #e9e2d2;
+            border-radius: 24px;
+            padding: 10px 16px;
+            font-style: italic;
+            color: #5e6e5b;
+            align-self: flex-start;
+        }
+    </style>
+</head>
+<body>
+<div id="loginPanel" class="login-panel">
+    <h2>⚔️ König's Private Territory</h2>
+    <input type="text" id="loginUsername" placeholder="Username" autocomplete="off">
+    <input type="password" id="loginPassword" placeholder="Your Password">
+    <div class="remember-row">
+        <label><input type="checkbox" id="rememberMe"> Remember me</label>
+    </div>
+    <button id="loginBtn">Enter</button>
+    <div id="loginError" class="error-msg"></div>
+</div>
+
+<div id="mainApp" class="app hidden">
+    <div class="top-bar">
+        <span>⚔️ König <button id="logoutBtn" class="logout-btn">Exit</button></span>
+    </div>
+    <div id="chatView" class="chat-area"></div>
+    <div class="input-area">
+        <textarea class="message-input" rows="1" placeholder="Say something to König..."></textarea>
+        <button class="send-btn">➤</button>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    // 🔧 请将此地址改为您部署在 Railway 的后端地址
+    // ============================================================
+    const BACKEND_URL = "koenig-backend-production.up.railway.app";
+    // ============================================================
+
+    let currentUser = null;
+    let conversation = [];
+
+    function showToast(msg) {
+        const t = document.createElement('div');
+        t.className = 'toast';
+        t.innerText = msg;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 2000);
+    }
+
+    function getUserKey() { return `koenig_${currentUser}`; }
+    
+    function saveConversation() {
+        if (!currentUser) return;
+        const key = getUserKey();
+        localStorage.setItem(`${key}_history`, JSON.stringify(conversation.slice(-50)));
+    }
+    
+    function loadConversation() {
+        if (!currentUser) return;
+        const key = getUserKey();
+        const saved = localStorage.getItem(`${key}_history`);
+        if (saved) {
+            conversation = JSON.parse(saved);
+        } else {
+            conversation = [];
+        }
+    }
+
+    const chatDiv = document.getElementById('chatView');
+    
+    async function translateText(txt) {
+        try {
+            const r = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(txt)}&langpair=en|zh`);
+            const d = await r.json();
+            return d.responseData.translatedText || txt;
+        } catch(e) { return txt; }
+    }
+    
+    async function addMessage(role, text, original = null) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `message ${role === 'user' ? 'user-message' : 'ai-message'}`;
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.innerText = text;
+        msgDiv.appendChild(bubble);
+        
+        const btnRow = document.createElement('div');
+        btnRow.className = 'message-buttons';
+        const transBtn = document.createElement('button');
+        transBtn.innerText = '🔍 Translate';
+        transBtn.className = 'msg-btn';
+        let transRow = null;
+        
+        transBtn.onclick = async () => {
+            if (transRow) {
+                transRow.remove();
+                transRow = null;
+                transBtn.innerText = '🔍 Translate';
+                return;
+            }
+            transBtn.innerText = '⏳ ...';
+            const src = original || text;
+            const translated = await translateText(src);
+            transBtn.innerText = '🔍 Hide';
+            transRow = document.createElement('div');
+            transRow.className = 'translation-row';
+            transRow.innerText = `📖 ${translated}`;
+            msgDiv.appendChild(transRow);
+        };
+        
+        btnRow.appendChild(transBtn);
+        msgDiv.appendChild(btnRow);
+        chatDiv.appendChild(msgDiv);
+        msgDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+
+    async function getKönigReply(userMsg, history = []) {
+        const sysPrompt = `You are König, a tall, shy, gentle operator. You speak mostly English, occasionally use German words like "Schatz", "Danke", "Guten Tag". You are caring, a bit insecure, and sweet. Keep replies short, warm, sincere. Never use Chinese. Always respond in English.`;
+        const messages = [{ role: 'system', content: sysPrompt }, { role: 'user', content: userMsg }];
+        for (let m of history.slice(-15)) messages.push(m);
+        
+        try {
+            const resp = await fetch(`${BACKEND_URL}/chat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ messages })
+            });
+            
+            if (resp.status === 401) {
+                logout();
+                return "Session expired. Please log in again.";
+            }
+            
+            if (!resp.ok) return "Hmm... Schatz, I'm having trouble thinking right now. 🥺";
+            
+            const data = await resp.json();
+            if (data.reply && data.reply.trim()) return data.reply;
+            return "I'm here, Schatz... just a bit slow today. 💚";
+        } catch (e) {
+            console.warn("Backend error", e);
+            return "Sorry, Schatz... my thoughts are fuzzy. Try again? 🥺";
+        }
+    }
+
+    async function sendMessage() {
+        const input = document.querySelector('.message-input');
+        const text = input.value.trim();
+        if (!text) return;
+        
+        input.value = '';
+        addMessage('user', text);
+        conversation.push({ role: 'user', content: text });
+        saveConversation();
+        
+        const typing = document.createElement('div');
+        typing.className = 'typing-indicator';
+        typing.innerText = 'König is typing... ✍️';
+        chatDiv.appendChild(typing);
+        typing.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        
+        const reply = await getKönigReply(text, conversation);
+        typing.remove();
+        
+        addMessage('ai', reply, reply);
+        conversation.push({ role: 'assistant', content: reply });
+        saveConversation();
+    }
+
+    // 登录相关
+    async function login(username, password, remember) {
+        try {
+            const res = await fetch(`${BACKEND_URL}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ username, password })
+            });
+            
+            if (res.ok) {
+                const data = await res.json();
+                currentUser = data.username;
+                if (remember) localStorage.setItem('koenig_last_user', currentUser);
+                loadConversation();
+                
+                document.getElementById('loginPanel').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                
+                // 显示聊天记录
+                chatDiv.innerHTML = '';
+                for (let msg of conversation) {
+                    if (msg.role === 'user') addMessage('user', msg.content);
+                    else if (msg.role === 'assistant') addMessage('ai', msg.content, msg.content);
+                }
+                
+                if (conversation.length === 0) {
+                    const welcome = await getKönigReply("Start conversation", []);
+                    addMessage('ai', welcome || "Hallo, Schatz. I'm König. I hope we can be friends... 🥺 Feel free to talk to me.");
+                    conversation.push({ role: 'assistant', content: welcome });
+                    saveConversation();
+                }
+            } else {
+                const err = await res.json();
+                document.getElementById('loginError').innerText = err.error || 'Invalid credentials';
+            }
+        } catch (e) {
+            document.getElementById('loginError').innerText = 'Network error. Is backend running?';
+        }
+    }
+    
+    async function autoLogin() {
+        try {
+            const res = await fetch(`${BACKEND_URL}/check_auth`, { credentials: 'include' });
+            if (res.ok) {
+                const data = await res.json();
+                currentUser = data.username;
+                loadConversation();
+                document.getElementById('loginPanel').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                
+                chatDiv.innerHTML = '';
+                for (let msg of conversation) {
+                    if (msg.role === 'user') addMessage('user', msg.content);
+                    else if (msg.role === 'assistant') addMessage('ai', msg.content, msg.content);
+                }
+                return true;
+            }
+        } catch (e) {}
+        return false;
+    }
+    
+    async function logout() {
+        try {
+            await fetch(`${BACKEND_URL}/logout`, { method: 'POST', credentials: 'include' });
+        } catch(e) {}
+        localStorage.removeItem('koenig_last_user');
+        location.reload();
+    }
+
+    // 事件绑定
+    document.getElementById('loginBtn').onclick = () => {
+        const user = document.getElementById('loginUsername').value.trim();
+        const pwd = document.getElementById('loginPassword').value.trim();
+        const remember = document.getElementById('rememberMe').checked;
+        if (!user || !pwd) {
+            document.getElementById('loginError').innerText = 'Enter username and password';
+            return;
+        }
+        login(user, pwd, remember);
+    };
+    
+    document.getElementById('logoutBtn')?.addEventListener('click', logout);
+    
+    document.querySelector('.send-btn').onclick = sendMessage;
+    document.querySelector('.message-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+    
+    // 尝试自动登录
+    autoLogin();
+</script>
+</body>
+</html>
